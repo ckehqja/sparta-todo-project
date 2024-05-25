@@ -30,8 +30,7 @@ public class TodoService {
 
 	public TodoResponseDto getTodo(long id) {
 		Todo todo = todoRepository.findById(id).orElseThrow(
-			() -> new EntityNotFoundException("Todo with id "
-				+ id + " not found"));
+			() -> new EntityNotFoundException("없는 일정입니다."));
 		return new TodoResponseDto(todo);
 	}
 
@@ -48,14 +47,22 @@ public class TodoService {
 	@Transactional
 	public TodoResponseDto updateTodo(TodoAddRequestDto requestDto, long id) {
 		Todo todo = todoRepository.findById(id).orElseThrow(
-			() -> new EntityNotFoundException("Todo with id "
-				+ id + " not found")
-		);
-		if(!requestDto.getPassword().equals(todo.getPassword())){
-			log.info(requestDto.getPassword(), todo.getPassword());
+			() -> new EntityNotFoundException("없는 일정입니다."));
+
+		if(!requestDto.getPassword().equals(todo.getPassword()))
 			throw new IllegalArgumentException("비밀번호 불일치");
-		}
+
 		todo.update(requestDto);
 		return new TodoResponseDto(todo);
+	}
+
+	public void deleteTodo(String password, Long id) {
+		Todo todo = todoRepository.findById(id).orElseThrow(
+			() -> new EntityNotFoundException("없는 일정입니다.")
+		);
+		if(!password.equals(todo.getPassword()))
+			throw new IllegalArgumentException("비밀번호 불일치");
+
+		todoRepository.delete(todo);
 	}
 }

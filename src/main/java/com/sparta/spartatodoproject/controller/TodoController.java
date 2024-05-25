@@ -3,6 +3,7 @@ package com.sparta.spartatodoproject.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,5 +47,12 @@ public class TodoController {
 		@RequestBody TodoAddRequestDto requestDto, @PathVariable("id") long id) {
 		TodoResponseDto responseDto = todoService.updateTodo(requestDto, id);
 		return ResponseEntity.ok().body(responseDto);
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<String> deleteTodo(
+		String password, @PathVariable Long id) {
+		todoService.deleteTodo(password, id);
+		return ResponseEntity.ok().body("삭제완료");
 	}
 }
