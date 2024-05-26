@@ -8,11 +8,15 @@ import com.sparta.spartatodoproject.dto.CommentRequestDto;
 import com.sparta.spartatodoproject.dto.CommentResponseDto;
 import com.sparta.spartatodoproject.entity.Comment;
 import com.sparta.spartatodoproject.entity.Todo;
+import com.sparta.spartatodoproject.entity.User;
 import com.sparta.spartatodoproject.exception.CommentErrorCode;
 import com.sparta.spartatodoproject.exception.MismatchException;
-import com.sparta.spartatodoproject.exception.TodoErrorCode;
 import com.sparta.spartatodoproject.exception.NotFoundException;
+import com.sparta.spartatodoproject.exception.TodoErrorCode;
+import com.sparta.spartatodoproject.exception.UserErrorCode;
+import com.sparta.spartatodoproject.repository.CommentRepository;
 import com.sparta.spartatodoproject.repository.TodoRepository;
+import com.sparta.spartatodoproject.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,11 +25,16 @@ import lombok.RequiredArgsConstructor;
 public class CommentService {
 	private final CommentRepository commentRepository;
 	private final TodoRepository todoRepository;
+	private final UserRepository userRepository;
 
 	public CommentResponseDto addComment(CommentRequestDto requestDto) {
 		Todo todo = todoRepository.findById(requestDto.getTodoId()).orElseThrow(
-			() -> new NotFoundException(TodoErrorCode.TODO_NOT_FOUND));
-		Comment comment = commentRepository.save(new Comment(requestDto, todo));
+			() -> new NotFoundException(TodoErrorCode.TODO_NOT_FOUND)
+		);
+		User user = userRepository.findById(requestDto.getUserId()).orElseThrow(
+			() -> new NotFoundException(UserErrorCode.USER_NOT_FOUND)
+		);
+		Comment comment = commentRepository.save(new Comment(requestDto, todo, user));
 		return new CommentResponseDto(comment);
 	}
 
@@ -34,7 +43,7 @@ public class CommentService {
 		Comment comment = commentRepository.findById(id).orElseThrow(
 			() -> new NotFoundException(CommentErrorCode.COMMENT_NOT_FOUND));
 
-		if(requestDto.getTodoId() != comment.getTodo().getId())
+		if (requestDto.getTodoId() != comment.getTodo().getId())
 			throw new MismatchException(CommentErrorCode.ID_MISMATCH);
 
 		comment.update(requestDto.getContents());
@@ -55,7 +64,6 @@ public class CommentService {
 		todoRepository.findById(todoId).orElseThrow(
 			() -> new NotFoundException(TodoErrorCode.TODO_NOT_FOUND)
 		);
-
 
 		commentRepository.delete(comment);
 	}

@@ -1,4 +1,4 @@
-package com.sparta.spartatodoproject.service;
+package com.sparta.spartatodoproject.repository;
 
 import org.springframework.data.repository.CrudRepository;
 

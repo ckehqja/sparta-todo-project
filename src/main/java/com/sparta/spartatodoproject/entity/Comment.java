@@ -20,15 +20,17 @@ public class Comment extends Timestamped {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	private String contents;
-	private String userId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "users_id")
+	private User user;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "todo_id")
 	private Todo todo;
 
-	public Comment(CommentRequestDto requestDto, Todo todo) {
+	public Comment(CommentRequestDto requestDto, Todo todo, User user) {
 		this.contents = requestDto.getContents();
-		this.userId = requestDto.getUserId();
 		this.todo = todo;
+		this.user = user;
 	}
 
 	public void update(String contents) {
