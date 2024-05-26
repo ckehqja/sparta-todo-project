@@ -4,6 +4,7 @@ import java.net.http.HttpResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import com.sparta.spartatodoproject.service.CommentService;
 import com.sparta.spartatodoproject.service.TodoService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -48,6 +50,13 @@ public class CommentController {
 			.data(responseDto).build());
 	}
 
-
+	@DeleteMapping("/{id}")
+	public ResponseEntity<CommonResponse> deleteComment(@PathVariable Long id,
+		Long todoId) {
+		commentService.deleteComment(id, todoId);
+		return ResponseEntity.ok().body(CommonResponse.builder()
+			.statusCode(HttpStatus.OK.value())
+			.message("댓글 삭제").build());
+	}
 }
 

@@ -40,4 +40,23 @@ public class CommentService {
 		comment.update(requestDto.getContents());
 		return new CommentResponseDto(comment);
 	}
+
+	public void deleteComment(long id, Long todoId) {
+		if (todoId == null)
+			throw new MismatchException(TodoErrorCode.ID_NOT_FOUND);
+
+		Comment comment = commentRepository.findById(id).orElseThrow(
+			() -> new NotFoundException(CommentErrorCode.COMMENT_NOT_FOUND)
+		);
+
+		if (comment.getTodo().getId() != todoId)
+			throw new MismatchException(CommentErrorCode.ID_MISMATCH);
+
+		todoRepository.findById(todoId).orElseThrow(
+			() -> new NotFoundException(TodoErrorCode.TODO_NOT_FOUND)
+		);
+
+
+		commentRepository.delete(comment);
+	}
 }
