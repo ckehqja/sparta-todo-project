@@ -7,13 +7,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sparta.spartatodoproject.controller.TodoAddRequestDto;
+import com.sparta.spartatodoproject.dto.TodoAddRequestDto;
 import com.sparta.spartatodoproject.dto.TodoListResponseDto;
 import com.sparta.spartatodoproject.dto.TodoResponseDto;
 import com.sparta.spartatodoproject.entity.Todo;
+import com.sparta.spartatodoproject.exception.PwMismatchException;
+import com.sparta.spartatodoproject.exception.TodoErrorCode;
+import com.sparta.spartatodoproject.exception.TodoNotFoundException;
 import com.sparta.spartatodoproject.repository.TodoRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -30,7 +32,8 @@ public class TodoService {
 
 	public TodoResponseDto getTodo(long id) {
 		Todo todo = todoRepository.findById(id).orElseThrow(
-			() -> new EntityNotFoundException("없는 일정입니다."));
+			() -> new TodoNotFoundException(TodoErrorCode.TODO_NOT_FOUND));
+
 		return new TodoResponseDto(todo);
 	}
 
@@ -47,10 +50,10 @@ public class TodoService {
 	@Transactional
 	public TodoResponseDto updateTodo(TodoAddRequestDto requestDto, long id) {
 		Todo todo = todoRepository.findById(id).orElseThrow(
-			() -> new EntityNotFoundException("없는 일정입니다."));
+			() -> new TodoNotFoundException(TodoErrorCode.TODO_NOT_FOUND));
 
-		if(!requestDto.getPassword().equals(todo.getPassword()))
-			throw new IllegalArgumentException("비밀번호 불일치");
+		if (!requestDto.getPassword().equals(todo.getPassword()))
+			throw new PwMismatchException(TodoErrorCode.PW_MISMATCH);
 
 		todo.update(requestDto);
 		return new TodoResponseDto(todo);
@@ -58,10 +61,10 @@ public class TodoService {
 
 	public void deleteTodo(String password, Long id) {
 		Todo todo = todoRepository.findById(id).orElseThrow(
-			() -> new EntityNotFoundException("없는 일정입니다.")
-		);
-		if(!password.equals(todo.getPassword()))
-			throw new IllegalArgumentException("비밀번호 불일치");
+			() -> new TodoNotFoundException(TodoErrorCode.TODO_NOT_FOUND));
+
+		if (!password.equals(todo.getPassword()))
+			throw new PwMismatchException(TodoErrorCode.PW_MISMATCH);
 
 		todoRepository.delete(todo);
 	}
