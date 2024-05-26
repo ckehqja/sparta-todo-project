@@ -1,6 +1,6 @@
 package com.sparta.spartatodoproject.entity;
 
-import com.sparta.spartatodoproject.controller.TodoAddRequestDto;
+import com.sparta.spartatodoproject.dto.TodoAddRequestDto;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
