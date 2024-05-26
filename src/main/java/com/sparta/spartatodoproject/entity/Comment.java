@@ -1,5 +1,7 @@
 package com.sparta.spartatodoproject.entity;
 
+import com.sparta.spartatodoproject.dto.CommentRequestDto;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -19,8 +21,13 @@ public class Comment extends Timestamped {
 	private long id;
 	private String contents;
 	private String userId;
-	private long todoId;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "todo_id")
 	private Todo todo;
+
+	public Comment(CommentRequestDto requestDto, Todo todo) {
+		this.contents = requestDto.getContents();
+		this.userId = requestDto.getUserId();
+		this.todo = todo;
+	}
 }
