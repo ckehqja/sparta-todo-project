@@ -3,8 +3,8 @@ package com.sparta.spartatodoproject.exception;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @Getter
-public class TodoNotFoundException extends RuntimeException {
+@RequiredArgsConstructor
+public class MismatchException extends RuntimeException {
 	private final ErrorCode errorCode;
 }

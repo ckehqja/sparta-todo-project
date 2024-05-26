@@ -16,8 +16,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.sparta.spartatodoproject.exception.CommonErrorCode;
 import com.sparta.spartatodoproject.exception.ErrorCode;
 import com.sparta.spartatodoproject.exception.ErrorResponse;
-import com.sparta.spartatodoproject.exception.PwMismatchException;
-import com.sparta.spartatodoproject.exception.TodoNotFoundException;
+import com.sparta.spartatodoproject.exception.MismatchException;
+import com.sparta.spartatodoproject.exception.NotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,14 +25,14 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalExceptionController extends ResponseEntityExceptionHandler {
 
-	@ExceptionHandler(TodoNotFoundException.class)
-	public ResponseEntity<Object> handleCustomException(TodoNotFoundException e) {
+	@ExceptionHandler(NotFoundException.class)
+	public ResponseEntity<Object> handleCustomException(NotFoundException e) {
 		ErrorCode errorCode = e.getErrorCode();
 		return handleExceptionInternal(errorCode);
 	}
 
-	@ExceptionHandler(PwMismatchException.class)
-	public ResponseEntity<Object> handleCustomException(PwMismatchException e) {
+	@ExceptionHandler(MismatchException.class)
+	public ResponseEntity<Object> handleCustomException(MismatchException e) {
 		ErrorCode errorCode = e.getErrorCode();
 		return handleExceptionInternal(errorCode);
 	}

@@ -11,9 +11,9 @@ import com.sparta.spartatodoproject.dto.TodoAddRequestDto;
 import com.sparta.spartatodoproject.dto.TodoListResponseDto;
 import com.sparta.spartatodoproject.dto.TodoResponseDto;
 import com.sparta.spartatodoproject.entity.Todo;
-import com.sparta.spartatodoproject.exception.PwMismatchException;
+import com.sparta.spartatodoproject.exception.MismatchException;
 import com.sparta.spartatodoproject.exception.TodoErrorCode;
-import com.sparta.spartatodoproject.exception.TodoNotFoundException;
+import com.sparta.spartatodoproject.exception.NotFoundException;
 import com.sparta.spartatodoproject.repository.TodoRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class TodoService {
 
 	public TodoResponseDto getTodo(long id) {
 		Todo todo = todoRepository.findById(id).orElseThrow(
-			() -> new TodoNotFoundException(TodoErrorCode.TODO_NOT_FOUND));
+			() -> new NotFoundException(TodoErrorCode.TODO_NOT_FOUND));
 
 		return new TodoResponseDto(todo);
 	}
@@ -50,10 +50,10 @@ public class TodoService {
 	@Transactional
 	public TodoResponseDto updateTodo(TodoAddRequestDto requestDto, long id) {
 		Todo todo = todoRepository.findById(id).orElseThrow(
-			() -> new TodoNotFoundException(TodoErrorCode.TODO_NOT_FOUND));
+			() -> new NotFoundException(TodoErrorCode.TODO_NOT_FOUND));
 
 		if (!requestDto.getPassword().equals(todo.getPassword()))
-			throw new PwMismatchException(TodoErrorCode.PW_MISMATCH);
+			throw new MismatchException(TodoErrorCode.PW_MISMATCH);
 
 		todo.update(requestDto);
 		return new TodoResponseDto(todo);
@@ -61,10 +61,10 @@ public class TodoService {
 
 	public void deleteTodo(String password, Long id) {
 		Todo todo = todoRepository.findById(id).orElseThrow(
-			() -> new TodoNotFoundException(TodoErrorCode.TODO_NOT_FOUND));
+			() -> new NotFoundException(TodoErrorCode.TODO_NOT_FOUND));
 
 		if (!password.equals(todo.getPassword()))
-			throw new PwMismatchException(TodoErrorCode.PW_MISMATCH);
+			throw new MismatchException(TodoErrorCode.PW_MISMATCH);
 
 		todoRepository.delete(todo);
 	}

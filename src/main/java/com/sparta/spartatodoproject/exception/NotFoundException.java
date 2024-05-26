@@ -3,8 +3,8 @@ package com.sparta.spartatodoproject.exception;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
 @RequiredArgsConstructor
-public class PwMismatchException extends RuntimeException {
+@Getter
+public class NotFoundException extends RuntimeException {
 	private final ErrorCode errorCode;
 }

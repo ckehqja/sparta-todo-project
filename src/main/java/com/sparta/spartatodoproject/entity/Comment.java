@@ -30,4 +30,8 @@ public class Comment extends Timestamped {
 		this.userId = requestDto.getUserId();
 		this.todo = todo;
 	}
+
+	public void update(String contents) {
+		this.contents = contents;
+	}
 }
