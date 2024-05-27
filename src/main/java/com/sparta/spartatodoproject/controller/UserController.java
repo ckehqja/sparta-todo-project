@@ -2,6 +2,7 @@ package com.sparta.spartatodoproject.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,9 @@ import com.sparta.spartatodoproject.CommonResponse;
 import com.sparta.spartatodoproject.dto.LoginRequestDto;
 import com.sparta.spartatodoproject.dto.UserRequestDto;
 import com.sparta.spartatodoproject.dto.UserResponseDto;
+import com.sparta.spartatodoproject.entity.User;
 import com.sparta.spartatodoproject.entity.UserRoleEnum;
+import com.sparta.spartatodoproject.jwt.JwtService;
 import com.sparta.spartatodoproject.jwt.JwtUtil;
 import com.sparta.spartatodoproject.service.UserService;
 
@@ -31,6 +34,7 @@ public class UserController {
 	private static final Logger log = LoggerFactory.getLogger(UserController.class);
 	private final UserService userService;
 	private final JwtUtil jwtUtil;
+	private final JwtService jwtService;
 
 	@PostMapping("/signup")
 	public ResponseEntity<CommonResponse<UserResponseDto>> addUser(
@@ -46,45 +50,50 @@ public class UserController {
 	@PostMapping("/login")
 	public ResponseEntity<CommonResponse<UserResponseDto>> login(
 		@Valid @RequestBody LoginRequestDto requestDto,
-		HttpServletResponse response) {
-		UserResponseDto responseDto = userService.login(requestDto, response);
-		return ResponseEntity.ok().body(CommonResponse.<UserResponseDto>builder()
-			.statusCode(HttpStatus.OK.value())
-			.message("로그인 성공")
-			.data(responseDto)
-			.build());
+		@RequestHeader("Refresh-Token") String oldRefreshToken) {
+		User user = userService.login(requestDto);
+		String accessToken = jwtUtil.createAccessToken(user.getUsername(), user.getRole());
+		if(oldRefreshToken != null) {
+			jwtService.delete(oldRefreshToken);
+		}
+		String refreshToken = jwtUtil.createRefreshTaken();
+
+		log.info("access token: {}", accessToken);
+		log.info("refresh token: {}", refreshToken);
+
+		jwtService.saveRefreshToken(refreshToken, user.getId());
+
+		return ResponseEntity.ok()
+			.header(HttpHeaders.AUTHORIZATION, accessToken)
+			.header("Refresh-Token", refreshToken)
+			.body(CommonResponse.<UserResponseDto>builder()
+				.statusCode(HttpStatus.OK.value())
+				.message("로그인 성공")
+				.data(new UserResponseDto(user))
+				.build());
 	}
 
-	@GetMapping("/create-jwt")
-	public String createJwt(HttpServletResponse res) {
-		// Jwt 생성
-		String token = jwtUtil.createToken("Robbie", UserRoleEnum.USER);
+	@GetMapping("/refresh")
+	public ResponseEntity<CommonResponse<String>> refreshToken(
+		@RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String accessToken,
+		@RequestHeader("Refresh-Token") String refreshToken
+	) {
+		Claims claims = jwtUtil.getClaimsFromExpiredToken(accessToken);
+		String role = claims.get("auth", String.class);
+		UserRoleEnum roleEnum = UserRoleEnum.valueOf(role);
+		String username = claims.getSubject();
+		log.info("role  : " + role);
 
-		// Jwt 쿠키 저장
-		jwtUtil.addJwtToHeader(token, res);
+		String newAccessToken = jwtUtil.createAccessToken(username, roleEnum);
 
-		return "createJwt : " + token;
-	}
+		return ResponseEntity.ok()
+			.header(HttpHeaders.AUTHORIZATION, newAccessToken)
+			.header("Refresh-Token", refreshToken)
+			.body(CommonResponse.<String>builder()
+				.statusCode(HttpStatus.OK.value())
+				.message("토큰 재발급 완료")
+				.data(newAccessToken + "access token 변경하세요")
+				.build());
 
-	@GetMapping("/get-jwt")
-	public String getJwt(@RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String value) {
-		// JWT 토큰 substring
-		String token = jwtUtil.substringToken(value);
-		log.info("getJwt : " + token);
-
-		// 토큰 검증
-		if (!jwtUtil.validateToken(token))
-			throw new IllegalArgumentException("Token Error");
-
-		// 토큰에서 사용자 정보 가져오기
-		Claims info = jwtUtil.getUserInfoFromToken(token);
-		// 사용자 username
-		String username = info.getSubject();
-		System.out.println("username = " + username);
-		// 사용자 권한
-		String authority = (String)info.get(JwtUtil.AUTHORIZATION_KEY);
-		System.out.println("authority = " + authority);
-
-		return "getJwt : " + username + ", " + authority;
 	}
 }
