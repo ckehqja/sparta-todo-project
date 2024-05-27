@@ -2,6 +2,7 @@ package com.sparta.spartatodoproject.entity;
 
 import com.sparta.spartatodoproject.dto.UserRequestDto;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -21,6 +22,7 @@ public class User extends Timestamped{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	private String nickname;
+	@Column(unique = true)
 	private String username;
 	private String password;
 	@Enumerated(EnumType.STRING)
