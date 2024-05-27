@@ -1,7 +1,6 @@
 package com.sparta.spartatodoproject.jwt;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.Key;
 import java.util.Base64;
@@ -22,7 +21,6 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -72,16 +70,12 @@ public class JwtUtil {
 	// JWT Cookie 에 저장
 	public void addJwtToHeader(String token, HttpServletResponse res) {
 		try {
-			// Cookie Value 에는 공백이 불가능해서 encoding 진행
+			// 공백이 불가능해서 encoding 진행
 			token = URLEncoder.encode(token, "utf-8")
 				.replaceAll("\\+", "%20");
 
 			res.addHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + token);
-			// Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token); // Name-Value
-			// cookie.setPath("/");
 
-			// Response 객체에 Cookie 추가
-			// res.addCookie(cookie);
 		} catch (UnsupportedEncodingException e) {
 			log.error(e.getMessage());
 		}
@@ -119,21 +113,8 @@ public class JwtUtil {
 			.parseClaimsJws(token).getBody();
 	}
 
-	// HttpServletRequest 에서 Cookie Value : JWT 가져오기
+	// HttpServletRequest : JWT 가져오기
 	public String getTokenFromRequest(HttpServletRequest req) {
-		// Cookie[] cookies = req.getCookies();
-
-		// if (cookies != null) {
-		// 	for (Cookie cookie : cookies) {
-		// 		if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
-		// 			try {
-		// 				return URLDecoder.decode(cookie.getValue(), "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
-		// 			} catch (UnsupportedEncodingException e) {
-		// 				return null;
-		// 			}
-		// 		}
-		// 	}
-		// }
 
 		if (req.getHeader(AUTHORIZATION_HEADER) != null) {
 			return req.getHeader(AUTHORIZATION_HEADER);

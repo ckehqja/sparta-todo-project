@@ -13,6 +13,7 @@ import com.sparta.spartatodoproject.exception.UserErrorCode;
 import com.sparta.spartatodoproject.jwt.JwtUtil;
 import com.sparta.spartatodoproject.repository.UserRepository;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -33,12 +34,18 @@ public class UserService {
 		return new UserResponseDto(user);
 	}
 
-	public UserResponseDto login(LoginRequestDto requestDto) {
-		User user = userRepository.findByUsername(requestDto.getUsername()).orElseThrow(
-			() -> new NotFoundException(UserErrorCode.USER_NOT_FOUND));
+	public UserResponseDto login(LoginRequestDto requestDto,
+		HttpServletResponse response) {
+		User user = userRepository.findByUsername(
+			requestDto.getUsername()).orElseThrow(
+			() -> new NotFoundException(UserErrorCode.USER_NOT_FOUND)
+		);
 
 		if (!user.getPassword().equals(requestDto.getPassword()))
 			throw new MismatchException(UserErrorCode.PW_MISMATCH);
+
+		String token = jwtUtil.createToken(user.getUsername(), user.getRole());
+		jwtUtil.addJwtToHeader(token, response);
 
 		return new UserResponseDto(user);
 	}

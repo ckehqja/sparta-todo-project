@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,8 +20,6 @@ import com.sparta.spartatodoproject.jwt.JwtUtil;
 import com.sparta.spartatodoproject.service.UserService;
 
 import io.jsonwebtoken.Claims;
-import io.swagger.v3.oas.annotations.headers.Header;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,8 +45,9 @@ public class UserController {
 
 	@PostMapping("/login")
 	public ResponseEntity<CommonResponse<UserResponseDto>> login(
-		@Valid @RequestBody LoginRequestDto requestDto) {
-		UserResponseDto responseDto = userService.login(requestDto);
+		@Valid @RequestBody LoginRequestDto requestDto,
+		HttpServletResponse response) {
+		UserResponseDto responseDto = userService.login(requestDto, response);
 		return ResponseEntity.ok().body(CommonResponse.<UserResponseDto>builder()
 			.statusCode(HttpStatus.OK.value())
 			.message("로그인 성공")
