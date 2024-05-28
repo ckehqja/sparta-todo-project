@@ -21,4 +21,8 @@ public class RefreshToken {
 		token = refreshToken;
 		userId = id;
 	}
+
+	public void updateToken(String refreshToken) {
+		token = refreshToken;
+	}
 }

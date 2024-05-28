@@ -23,7 +23,6 @@ import com.sparta.spartatodoproject.jwt.JwtUtil;
 import com.sparta.spartatodoproject.service.UserService;
 
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -49,13 +48,11 @@ public class UserController {
 
 	@PostMapping("/login")
 	public ResponseEntity<CommonResponse<UserResponseDto>> login(
-		@Valid @RequestBody LoginRequestDto requestDto,
-		@RequestHeader("Refresh-Token") String oldRefreshToken) {
+		@RequestBody LoginRequestDto requestDto) {
 		User user = userService.login(requestDto);
 		String accessToken = jwtUtil.createAccessToken(user.getUsername(), user.getRole());
-		if(oldRefreshToken != null) {
-			jwtService.delete(oldRefreshToken);
-		}
+		// if(oldRefreshToken != null)
+		// 	jwtService.delete(oldRefreshToken);
 		String refreshToken = jwtUtil.createRefreshTaken();
 
 		log.info("access token: {}", accessToken);
@@ -92,7 +89,7 @@ public class UserController {
 			.body(CommonResponse.<String>builder()
 				.statusCode(HttpStatus.OK.value())
 				.message("토큰 재발급 완료")
-				.data(newAccessToken + "access token 변경하세요")
+				.data(newAccessToken + "     <-  access token 변경하세요")
 				.build());
 
 	}

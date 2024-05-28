@@ -2,8 +2,6 @@ package com.sparta.spartatodoproject.service;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,9 +9,11 @@ import com.sparta.spartatodoproject.dto.TodoAddRequestDto;
 import com.sparta.spartatodoproject.dto.TodoListResponseDto;
 import com.sparta.spartatodoproject.dto.TodoResponseDto;
 import com.sparta.spartatodoproject.entity.Todo;
+import com.sparta.spartatodoproject.entity.User;
 import com.sparta.spartatodoproject.exception.MismatchException;
 import com.sparta.spartatodoproject.exception.TodoErrorCode;
 import com.sparta.spartatodoproject.exception.NotFoundException;
+import com.sparta.spartatodoproject.jwt.JwtService;
 import com.sparta.spartatodoproject.repository.TodoRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -22,11 +22,12 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class TodoService {
 
-	private static final Logger log = LoggerFactory.getLogger(TodoService.class);
 	private final TodoRepository todoRepository;
+	private final JwtService jwtService;
 
-	public TodoResponseDto addTodo(TodoAddRequestDto requestDto) {
-		Todo todo = todoRepository.save(new Todo(requestDto));
+	public TodoResponseDto addTodo(TodoAddRequestDto requestDto, String token) {
+		User user = jwtService.tokenUser(token);
+		Todo todo = todoRepository.save(new Todo(requestDto, user));
 		return new TodoResponseDto(todo);
 	}
 
@@ -48,23 +49,27 @@ public class TodoService {
 	}
 
 	@Transactional
-	public TodoResponseDto updateTodo(TodoAddRequestDto requestDto, long id) {
+	public TodoResponseDto updateTodo(TodoAddRequestDto requestDto, long id, String token) {
 		Todo todo = todoRepository.findById(id).orElseThrow(
 			() -> new NotFoundException(TodoErrorCode.TODO_NOT_FOUND));
 
-		if (!requestDto.getPassword().equals(todo.getPassword()))
-			throw new MismatchException(TodoErrorCode.PW_MISMATCH);
+		User user = jwtService.tokenUser(token);
+
+		if(!user.equals(todo.getUser()))
+			throw new MismatchException(TodoErrorCode.USER_MISMATCH);
 
 		todo.update(requestDto);
 		return new TodoResponseDto(todo);
 	}
 
-	public void deleteTodo(String password, Long id) {
+	public void deleteTodo(String token, Long id) {
 		Todo todo = todoRepository.findById(id).orElseThrow(
 			() -> new NotFoundException(TodoErrorCode.TODO_NOT_FOUND));
 
-		if (!password.equals(todo.getPassword()))
-			throw new MismatchException(TodoErrorCode.PW_MISMATCH);
+		User user = jwtService.tokenUser(token);
+
+		if(!user.equals(todo.getUser()))
+			throw new MismatchException(TodoErrorCode.USER_MISMATCH);
 
 		todoRepository.delete(todo);
 	}

@@ -9,7 +9,6 @@ public class CommentRequestDto {
 
 	@NotBlank
 	private String contents;
-	private Long userId;
 	@NotNull
 	private Long todoId;
 

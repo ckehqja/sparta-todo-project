@@ -18,7 +18,7 @@ public class TodoResponseDto {
 		this.id = todo.getId();
 		this.title = todo.getTitle();
 		this.contents = todo.getContents();
-		this.manager = todo.getManager();
+		this.manager = todo.getUser().getNickname();
 		this.createdDate = todo.getCreatedAt();
 	}
 }

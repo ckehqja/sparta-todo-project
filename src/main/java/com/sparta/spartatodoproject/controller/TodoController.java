@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,6 +16,7 @@ import com.sparta.spartatodoproject.CommonResponse;
 import com.sparta.spartatodoproject.dto.TodoAddRequestDto;
 import com.sparta.spartatodoproject.dto.TodoListResponseDto;
 import com.sparta.spartatodoproject.dto.TodoResponseDto;
+import com.sparta.spartatodoproject.jwt.JwtUtil;
 import com.sparta.spartatodoproject.service.TodoService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,8 +36,9 @@ public class TodoController {
 	@Parameter(description = "dto를 받아 유효검사")
 	@PostMapping
 	public ResponseEntity<CommonResponse<TodoResponseDto>> addTodo(
-		@Valid @RequestBody TodoAddRequestDto requestDto) {
-		TodoResponseDto responseDto = todoService.addTodo(requestDto);
+		@Valid @RequestBody TodoAddRequestDto requestDto,
+		@RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String token) {
+		TodoResponseDto responseDto = todoService.addTodo(requestDto, token);
 		return ResponseEntity.ok().body(CommonResponse.<TodoResponseDto>builder()
 			.statusCode(HttpStatus.OK.value())
 			.message("일정 저장")
@@ -67,8 +70,9 @@ public class TodoController {
 	@Parameter(description = "수정할 일정을 경로로 받고 수정 dto 와 검증을 위한 비밀번호를 받아온다.")
 	@PutMapping("/{id}")
 	public ResponseEntity<CommonResponse<TodoResponseDto>> updateTodo(
-		@Valid @RequestBody TodoAddRequestDto requestDto, @PathVariable("id") long id) {
-		TodoResponseDto responseDto = todoService.updateTodo(requestDto, id);
+		@Valid @RequestBody TodoAddRequestDto requestDto, @PathVariable("id") long id,
+		@RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String token) {
+		TodoResponseDto responseDto = todoService.updateTodo(requestDto, id, token);
 		return ResponseEntity.ok().body(CommonResponse.<TodoResponseDto>builder()
 			.statusCode(HttpStatus.OK.value())
 			.message("일정 저장")
@@ -79,8 +83,8 @@ public class TodoController {
 	@Parameter(description = "삭제할 일정을 경로로 받고 검증을 위한 비밀번호를 받아온다.")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<CommonResponse> deleteTodo(
-		String password, @PathVariable Long id) {
-		todoService.deleteTodo(password, id);
+		@PathVariable Long id, @RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String token) {
+		todoService.deleteTodo(token, id);
 		return ResponseEntity.ok().body(CommonResponse.<TodoResponseDto>builder()
 			.statusCode(HttpStatus.OK.value())
 			.message("일정 삭제")

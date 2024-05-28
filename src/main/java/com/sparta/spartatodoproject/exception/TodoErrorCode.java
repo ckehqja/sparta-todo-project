@@ -14,7 +14,9 @@ public enum TodoErrorCode implements ErrorCode{
 	TODO_NOT_FOUND(HttpStatus.NOT_FOUND,
 		"일정이 없습니다."),
 	ID_NOT_FOUND(HttpStatus.NOT_FOUND,
-		"아이디값이 없습니다.");
+		"아이디값이 없습니다."),
+	USER_MISMATCH(HttpStatus.NOT_FOUND,
+		"본인 글만 지울 수 있습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;
