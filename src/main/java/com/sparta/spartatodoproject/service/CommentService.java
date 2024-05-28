@@ -3,7 +3,6 @@ package com.sparta.spartatodoproject.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sparta.spartatodoproject.dto.CommentEditRequestDto;
 import com.sparta.spartatodoproject.dto.CommentRequestDto;
 import com.sparta.spartatodoproject.dto.CommentResponseDto;
 import com.sparta.spartatodoproject.entity.Comment;
@@ -13,13 +12,11 @@ import com.sparta.spartatodoproject.exception.CommentErrorCode;
 import com.sparta.spartatodoproject.exception.MismatchException;
 import com.sparta.spartatodoproject.exception.NotFoundException;
 import com.sparta.spartatodoproject.exception.TodoErrorCode;
-import com.sparta.spartatodoproject.exception.UserErrorCode;
-import com.sparta.spartatodoproject.jwt.JwtUtil;
+import com.sparta.spartatodoproject.jwt.JwtService;
 import com.sparta.spartatodoproject.repository.CommentRepository;
 import com.sparta.spartatodoproject.repository.TodoRepository;
-import com.sparta.spartatodoproject.repository.UserRepository;
 
-import io.jsonwebtoken.Claims;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -27,24 +24,22 @@ import lombok.RequiredArgsConstructor;
 public class CommentService {
 	private final CommentRepository commentRepository;
 	private final TodoRepository todoRepository;
-	private final UserRepository userRepository;
-	private final JwtUtil jwtUtil;
-
+	private final JwtService jwtService;
 	public CommentResponseDto addComment(CommentRequestDto requestDto, String token) {
-		User user = tokenUser(token);
+		User user = jwtService.tokenUser(token);
 
 		Todo todo = todoRepository.findById(requestDto.getTodoId()).orElseThrow(
 			() -> new NotFoundException(TodoErrorCode.TODO_NOT_FOUND)
 		);
 
-		Comment comment = commentRepository.save(new Comment(requestDto, todo, user));
+		Comment comment = commentRepository.save(new Comment(requestDto.getContents(), todo, user));
 		return new CommentResponseDto(comment);
 	}
 
 	@Transactional
 	public CommentResponseDto updateComment(long id,
-		CommentEditRequestDto requestDto, String token) {
-		User user = tokenUser(token);
+		@Valid CommentRequestDto requestDto, String token) {
+		User user = jwtService.tokenUser(token);
 
 		Comment comment = commentRepository.findById(id).orElseThrow(
 			() -> new NotFoundException(CommentErrorCode.COMMENT_NOT_FOUND));
@@ -60,7 +55,7 @@ public class CommentService {
 	}
 
 	public void deleteComment(long id, Long todoId, String token) {
-		User user = tokenUser(token);
+		User user = jwtService.tokenUser(token);
 
 		if (todoId == null)
 			throw new MismatchException(TodoErrorCode.ID_NOT_FOUND);
@@ -82,12 +77,4 @@ public class CommentService {
 		commentRepository.delete(comment);
 	}
 
-	private User tokenUser(String token) {
-		token = jwtUtil.substringToken(token);
-		jwtUtil.validateToken(token);
-		Claims info = jwtUtil.getUserInfoFromToken(token);
-		String username = info.getSubject();
-		return userRepository.findByUsername(username).orElseThrow(
-			() -> new NotFoundException(UserErrorCode.USER_NOT_FOUND));
-	}
 }
