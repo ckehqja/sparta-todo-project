@@ -90,7 +90,6 @@ public class AuthFilter implements Filter {
 							new NullPointerException("Not Found User")
 						);
 
-						log.info("{} 로그인 성공 ", user.getUsername());
 					} catch (ExpiredJwtException e) {
 						httpServletResponse.sendRedirect("/user/refresh");
 					}
