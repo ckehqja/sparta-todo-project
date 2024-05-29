@@ -10,6 +10,7 @@ import com.sparta.spartatodoproject.entity.UserRoleEnum;
 import com.sparta.spartatodoproject.exception.MismatchException;
 import com.sparta.spartatodoproject.exception.NotFoundException;
 import com.sparta.spartatodoproject.exception.UserErrorCode;
+import com.sparta.spartatodoproject.jwt.JwtService;
 import com.sparta.spartatodoproject.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 	private final UserRepository userRepository;
 	private final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
+	private final JwtService jwtService;
 
 	public UserResponseDto signup(UserRequestDto requestDto) {
 		UserRoleEnum role = UserRoleEnum.USER;
@@ -40,5 +42,12 @@ public class UserService {
 		if (!user.getPassword().equals(requestDto.getPassword()))
 			throw new MismatchException(UserErrorCode.PW_MISMATCH);
 		return user;
+	}
+
+	public void delete(long id, String token) {
+		User user = jwtService.tokenUser(token);
+		if(user.getId() != id)
+			throw new MismatchException(UserErrorCode.USER_NOT_FOUND);
+		userRepository.deleteById(id);
 	}
 }

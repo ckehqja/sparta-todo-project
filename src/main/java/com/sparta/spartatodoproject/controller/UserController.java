@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -20,6 +22,7 @@ import com.sparta.spartatodoproject.entity.User;
 import com.sparta.spartatodoproject.entity.UserRoleEnum;
 import com.sparta.spartatodoproject.jwt.JwtService;
 import com.sparta.spartatodoproject.jwt.JwtUtil;
+import com.sparta.spartatodoproject.service.TodoService;
 import com.sparta.spartatodoproject.service.UserService;
 
 import io.jsonwebtoken.Claims;
@@ -34,6 +37,7 @@ public class UserController {
 	private final UserService userService;
 	private final JwtUtil jwtUtil;
 	private final JwtService jwtService;
+	private final TodoService todoService;
 
 	@PostMapping("/signup")
 	public ResponseEntity<CommonResponse<UserResponseDto>> addUser(
@@ -92,5 +96,17 @@ public class UserController {
 				.data(newAccessToken + "     <-  access token 변경하세요")
 				.build());
 
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<CommonResponse> deleteUser(
+		@PathVariable int id, @RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String token
+	) {
+		userService.delete(id, token);
+		return ResponseEntity.ok().body(
+			CommonResponse.builder()
+				.statusCode(HttpStatus.OK.value())
+				.message("삭제 완료")
+				.build());
 	}
 }
