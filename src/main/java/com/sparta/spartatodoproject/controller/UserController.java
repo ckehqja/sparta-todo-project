@@ -62,7 +62,7 @@ public class UserController {
 		log.info("access token: {}", accessToken);
 		log.info("refresh token: {}", refreshToken);
 
-		jwtService.saveRefreshToken(refreshToken, user.getId());
+		jwtService.saveRefreshToken(refreshToken, user);
 
 		return ResponseEntity.ok()
 			.header(HttpHeaders.AUTHORIZATION, accessToken)

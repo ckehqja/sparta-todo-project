@@ -9,7 +9,5 @@ import com.sparta.spartatodoproject.entity.Todo;
 
 public interface StorageRepository extends JpaRepository<ImageData, Long> {
 
-	Optional<ImageData> findByName(String fileName);
-
 	Optional<ImageData> findByTodo(Todo todo);
 }

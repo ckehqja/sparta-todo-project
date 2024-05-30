@@ -21,10 +21,14 @@ public class User extends Timestamped{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
+
 	private String nickname;
+
 	@Column(unique = true)
 	private String username;
+
 	private String password;
+
 	@Enumerated(EnumType.STRING)
 	private UserRoleEnum role;
 
