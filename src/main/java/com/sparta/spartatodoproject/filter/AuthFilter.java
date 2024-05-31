@@ -64,6 +64,7 @@ public class AuthFilter implements Filter {
 			if ("GET".equalsIgnoreCase(method)) {
 				log.info("get 요청은 모두 통과");
 				chain.doFilter(request, response);
+				return;
 			}
 
 			log.info("인증처리 {} {} ", method, url);
@@ -91,7 +92,6 @@ public class AuthFilter implements Filter {
 						httpServletResponse.sendRedirect("/user/refresh");
 					}
 					chain.doFilter(request, response);
-
 				}
 
 				// 다음 Filter 로 이동
