@@ -13,7 +13,6 @@ import com.sparta.spartatodoproject.exception.MismatchException;
 import com.sparta.spartatodoproject.exception.NotFoundException;
 import com.sparta.spartatodoproject.exception.TodoErrorCode;
 import com.sparta.spartatodoproject.exception.UserErrorCode;
-import com.sparta.spartatodoproject.jwt.JwtService;
 import com.sparta.spartatodoproject.repository.CommentRepository;
 import com.sparta.spartatodoproject.repository.TodoRepository;
 import com.sparta.spartatodoproject.repository.UserRepository;
@@ -52,7 +51,7 @@ public class CommentService {
 		Comment comment = commentRepository.findById(id).orElseThrow(
 			() -> new NotFoundException(CommentErrorCode.COMMENT_NOT_FOUND));
 
-		if(!user.equals(comment.getUser()))
+		if (!user.equals(comment.getUser()))
 			throw new MismatchException(CommentErrorCode.ID_MISMATCH);
 
 		if (requestDto.getTodoId() != comment.getTodo().getId())
@@ -73,7 +72,7 @@ public class CommentService {
 			() -> new NotFoundException(CommentErrorCode.COMMENT_NOT_FOUND)
 		);
 
-		if(!user.equals(comment.getUser()))
+		if (!user.equals(comment.getUser()))
 			throw new MismatchException(CommentErrorCode.ID_MISMATCH);
 
 		if (comment.getTodo().getId() != todoId)

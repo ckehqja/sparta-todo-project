@@ -43,17 +43,6 @@ public class StorageService {
 		}
 
 		throw new NotFoundException(StorageErrorCode.FILE_TYPE_MISMATCH);
-
-	}
-
-	// 이미지 파일로 압축하기
-	public byte[] downloadImage(Long id) {
-		ImageData imageData = storageRepository.findById(id)
-			.orElseThrow(RuntimeException::new);
-
-		log.info("download imageData: {}", imageData);
-
-		return ImageUtils.decompressImage(imageData.getImageData());
 	}
 
 	@Transactional

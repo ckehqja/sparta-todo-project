@@ -1,5 +1,6 @@
 package com.sparta.spartatodoproject.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.sparta.spartatodoproject.dto.LoginRequestDto;
@@ -10,7 +11,6 @@ import com.sparta.spartatodoproject.entity.UserRoleEnum;
 import com.sparta.spartatodoproject.exception.MismatchException;
 import com.sparta.spartatodoproject.exception.NotFoundException;
 import com.sparta.spartatodoproject.exception.UserErrorCode;
-import com.sparta.spartatodoproject.jwt.JwtService;
 import com.sparta.spartatodoproject.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,8 +21,8 @@ public class UserService {
 
 	private final UserRepository userRepository;
 
-	private final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
-	private final JwtService jwtService;
+	@Value("${user.admin.token}")
+	private String ADMIN_TOKEN;
 
 	public UserResponseDto signup(UserRequestDto requestDto) {
 		UserRoleEnum role = UserRoleEnum.USER;
@@ -50,7 +50,7 @@ public class UserService {
 		User user = userRepository.findByUsername(username).orElseThrow(
 			() -> new NotFoundException(UserErrorCode.USER_NOT_FOUND)
 		);
-		if(user.getId() != id)
+		if (user.getId() != id)
 			throw new MismatchException(UserErrorCode.USER_NOT_FOUND);
 		userRepository.deleteById(id);
 	}
