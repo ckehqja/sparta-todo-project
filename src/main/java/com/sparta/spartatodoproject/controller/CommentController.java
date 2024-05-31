@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sparta.spartatodoproject.CommonResponse;
 import com.sparta.spartatodoproject.dto.CommentRequestDto;
 import com.sparta.spartatodoproject.dto.CommentResponseDto;
-import com.sparta.spartatodoproject.jwt.JwtService;
+import com.sparta.spartatodoproject.service.RefreshTokenService;
 import com.sparta.spartatodoproject.jwt.JwtUtil;
 import com.sparta.spartatodoproject.service.CommentService;
 
@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class CommentController {
 	private final CommentService commentService;
-	private final JwtService jwtService;
+	private final RefreshTokenService refreshTokenService;
 
 	@Operation(description = "댓글 등록")
 	@Parameter(description = "@RequestBody 댓글 dto, @RequestHeader 토큰")
@@ -38,7 +38,7 @@ public class CommentController {
 	public ResponseEntity<CommonResponse<CommentResponseDto>> addComment(
 		@Valid @RequestBody CommentRequestDto requestDto,
 		@RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String token) {
-		String username = jwtService.tokenUsername(token);
+		String username = refreshTokenService.tokenUsername(token);
 		CommentResponseDto responseDto = commentService.addComment(requestDto, username);
 		return ResponseEntity.ok().body(CommonResponse.<CommentResponseDto>builder()
 			.statusCode(HttpStatus.OK.value())
@@ -52,7 +52,7 @@ public class CommentController {
 	public ResponseEntity<CommonResponse<CommentResponseDto>> updateComment(
 		@PathVariable long id, @Valid @RequestBody CommentRequestDto requestDto,
 		@RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String token) {
-		String username = jwtService.tokenUsername(token);
+		String username = refreshTokenService.tokenUsername(token);
 		CommentResponseDto responseDto = commentService.updateComment(id, requestDto, username);
 		return ResponseEntity.ok().body(CommonResponse.<CommentResponseDto>builder()
 			.statusCode(HttpStatus.OK.value())
@@ -66,7 +66,7 @@ public class CommentController {
 	public ResponseEntity<CommonResponse> deleteComment(@PathVariable Long id,
 		Long todoId, @RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String token) {
 
-		String username = jwtService.tokenUsername(token);
+		String username = refreshTokenService.tokenUsername(token);
 		commentService.deleteComment(id, todoId, username);
 		return ResponseEntity.ok().body(CommonResponse.builder()
 			.statusCode(HttpStatus.OK.value())

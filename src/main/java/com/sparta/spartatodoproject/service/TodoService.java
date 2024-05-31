@@ -16,7 +16,6 @@ import com.sparta.spartatodoproject.exception.MismatchException;
 import com.sparta.spartatodoproject.exception.TodoErrorCode;
 import com.sparta.spartatodoproject.exception.NotFoundException;
 import com.sparta.spartatodoproject.exception.UserErrorCode;
-import com.sparta.spartatodoproject.jwt.JwtService;
 import com.sparta.spartatodoproject.repository.TodoRepository;
 import com.sparta.spartatodoproject.repository.UserRepository;
 

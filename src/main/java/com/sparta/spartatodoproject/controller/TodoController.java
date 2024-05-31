@@ -19,7 +19,7 @@ import com.sparta.spartatodoproject.CommonResponse;
 import com.sparta.spartatodoproject.dto.TodoAddRequestDto;
 import com.sparta.spartatodoproject.dto.TodoListResponseDto;
 import com.sparta.spartatodoproject.dto.TodoResponseDto;
-import com.sparta.spartatodoproject.jwt.JwtService;
+import com.sparta.spartatodoproject.service.RefreshTokenService;
 import com.sparta.spartatodoproject.jwt.JwtUtil;
 import com.sparta.spartatodoproject.service.TodoService;
 
@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TodoController {
 
 	private final TodoService todoService;
-	private final JwtService jwtService;
+	private final RefreshTokenService jwtService;
 
 	@Operation(description = "일정 등록 + 파일 등록")
 	@Parameter(description = "이미지 파일을 받기위해 @RequestPart 로 이미지와 dto 를 받고 사용자 정보는 토큰으로 해결")

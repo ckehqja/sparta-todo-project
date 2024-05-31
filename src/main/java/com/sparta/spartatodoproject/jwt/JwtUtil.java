@@ -34,6 +34,7 @@ public class JwtUtil {
 	public static final String AUTHORIZATION_KEY = "auth";
 	// Token 식별자 ('Bearer '가 붙어있으면 토큰이라는 형식적인 규칙)
 	public static final String BEARER_PREFIX = "Bearer ";
+	public static final String REFRESH_TOKEN = "refresh_token";
 	// 토큰 만료시간
 	private final long ACCESS_TOKEN_TIME = 60 * 60 * 1000L; // 60분
 	private final long REFRESH_TOKEN_TIME = 10 * 24 * 60 * 60 * 1000L; // 10일
@@ -51,9 +52,6 @@ public class JwtUtil {
 		key = Keys.hmacShaKeyFor(bytes);
 	}
 
-	//쿠키를 반환하는 방법
-	// 1. 헤더에 담기 - 코드가 짮다.
-	// 2. 쿠키생성 후 쿠키에 담기 - 만료기한 설정, 추가 정보 담을 수 있음 <-
 	// 토큰 생성
 	public String createAccessToken(String username, UserRoleEnum role) {
 		Date date = new Date(); //날짜 관련 클래스
@@ -77,25 +75,6 @@ public class JwtUtil {
 				.setIssuedAt(date) // 발급일
 				.signWith(key, signatureAlgorithm) // 암호화 알고리즘
 				.compact();
-	}
-
-	// JWT Cookie 에 저장
-	public void addJwtToHeader(String token, HttpServletResponse res) {
-		try {
-			// 공백이 불가능해서 encoding 진행
-			token = tokenEncode(token);
-
-			res.addHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + token);
-
-		} catch (UnsupportedEncodingException e) {
-			log.error(e.getMessage());
-		}
-	}
-
-	public static String tokenEncode(String token) throws UnsupportedEncodingException {
-		token = URLEncoder.encode(token, "utf-8")
-			.replaceAll("\\+", "%20");
-		return token;
 	}
 
 	// JWT 토큰 substring
@@ -139,9 +118,11 @@ public class JwtUtil {
 		return null;
 	}
 
+	//만료된 토큰에서 정보 빼오기
 	public Claims getClaimsFromExpiredToken(String token) {
 		try {
-			return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(substringToken((token))).getBody();
+			return Jwts.parser().setSigningKey(secretKey)
+				.parseClaimsJws(substringToken((token))).getBody();
 		} catch (ExpiredJwtException e) {
 			return e.getClaims();
 		}
