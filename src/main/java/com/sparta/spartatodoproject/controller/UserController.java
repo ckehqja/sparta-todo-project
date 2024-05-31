@@ -101,7 +101,8 @@ public class UserController {
 	public ResponseEntity<CommonResponse> deleteUser(
 		@PathVariable int id, @RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String token
 	) {
-		userService.delete(id, token);
+		String username = jwtService.tokenUsername(token);
+		userService.delete(id, username);
 		return ResponseEntity.ok().body(
 			CommonResponse.builder()
 				.statusCode(HttpStatus.OK.value())

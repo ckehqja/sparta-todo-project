@@ -19,6 +19,7 @@ import com.sparta.spartatodoproject.CommonResponse;
 import com.sparta.spartatodoproject.dto.TodoAddRequestDto;
 import com.sparta.spartatodoproject.dto.TodoListResponseDto;
 import com.sparta.spartatodoproject.dto.TodoResponseDto;
+import com.sparta.spartatodoproject.jwt.JwtService;
 import com.sparta.spartatodoproject.jwt.JwtUtil;
 import com.sparta.spartatodoproject.service.TodoService;
 
@@ -37,16 +38,18 @@ import lombok.extern.slf4j.Slf4j;
 public class TodoController {
 
 	private final TodoService todoService;
+	private final JwtService jwtService;
 
-	@Operation(description = "일정 등록")
-	@Parameter(description = "dto를 받아 유효검사")
+	@Operation(description = "일정 등록 + 파일 등록")
+	@Parameter(description = "이미지 파일을 받기위해 @RequestPart 로 이미지와 dto 를 받고 사용자 정보는 토큰으로 해결")
 	@PostMapping
 	public ResponseEntity<CommonResponse<TodoResponseDto>> addTodo(
 		@Valid @RequestPart TodoAddRequestDto requestDto,
 		@RequestPart(value = "image", required = false) MultipartFile file,
 		@RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String token) throws IOException {
-
-		TodoResponseDto responseDto = todoService.addTodo(requestDto, token, file);
+		String username = jwtService.tokenUsername(token);
+		//사용자 토큰이 없으면 오류발생
+		TodoResponseDto responseDto = todoService.addTodo(requestDto, username, file);
 
 		return ResponseEntity.ok().body(CommonResponse.<TodoResponseDto>builder()
 			.statusCode(HttpStatus.OK.value())
@@ -54,47 +57,51 @@ public class TodoController {
 			.data(responseDto).build());
 	}
 
-	@Operation(description = "일정 조회")
+	@Operation(description = "일정 상세 조회")
 	@Parameter(description = "경로값을 받아와서 조회")
 	@GetMapping("/{id}")
 	public ResponseEntity<CommonResponse<TodoResponseDto>> getTodoById(
 		@PathVariable("id") long id) {
-		TodoResponseDto responseDto = todoService.getTodo(id);
+
 		return ResponseEntity.ok().body(CommonResponse.<TodoResponseDto>builder()
 			.statusCode(HttpStatus.OK.value())
 			.message("일정 조회")
-			.data(responseDto).build());
+			.data(todoService.getTodo(id)).build());
 	}
 
 	@Operation(description = "일정 전체 생성일 기준 내림차순으로 조회")
 	@GetMapping
 	public ResponseEntity<CommonResponse<TodoListResponseDto>> getAllTodos() {
+
 		return ResponseEntity.ok().body(CommonResponse.<TodoListResponseDto>builder()
 			.statusCode(HttpStatus.OK.value())
 			.message("일정 전체 조회")
 			.data(todoService.getTodoList()).build());
 	}
 
-	@Operation(description = "일정 수정, 비밀번호가 일치해야 함")
+	@Operation(description = "일정 수정 - 작성자만 수정 가능")
 	@Parameter(description = "수정할 일정을 경로로 받고 수정 dto 와 검증을 위한 비밀번호를 받아온다.")
 	@PutMapping("/{id}")
 	public ResponseEntity<CommonResponse<TodoResponseDto>> updateTodo(
 		@Valid @RequestPart TodoAddRequestDto requestDto, @PathVariable("id") long id,
 		@RequestPart(value = "image", required = false) MultipartFile file,
 		@RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String token) throws IOException {
-		TodoResponseDto responseDto = todoService.updateTodo(requestDto, id, token, file);
+		String username = jwtService.tokenUsername(token);
+
+		TodoResponseDto responseDto = todoService.updateTodo(requestDto, id, username, file);
 		return ResponseEntity.ok().body(CommonResponse.<TodoResponseDto>builder()
 			.statusCode(HttpStatus.OK.value())
 			.message("일정 저장")
 			.data(responseDto).build());
 	}
 
-	@Operation(description = "일정 삭제, 비밀번호가 일치해야 함")
-	@Parameter(description = "삭제할 일정을 경로로 받고 검증을 위한 비밀번호를 받아온다.")
+	@Operation(description = "일정 삭제, 작성자만")
+	@Parameter(description = "경로로 아아디를 받고 토큰으로 작성자 확인 후 삭제")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<CommonResponse> deleteTodo(
 		@PathVariable Long id, @RequestHeader(JwtUtil.AUTHORIZATION_HEADER) String token) {
-		todoService.deleteTodo(token, id);
+		String username = jwtService.tokenUsername(token);
+		todoService.deleteTodo(username, id);
 		return ResponseEntity.ok().body(CommonResponse.<TodoResponseDto>builder()
 			.statusCode(HttpStatus.OK.value())
 			.message("일정 삭제")

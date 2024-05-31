@@ -18,7 +18,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class UserService {
+
 	private final UserRepository userRepository;
+
 	private final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
 	private final JwtService jwtService;
 
@@ -44,8 +46,10 @@ public class UserService {
 		return user;
 	}
 
-	public void delete(long id, String token) {
-		User user = jwtService.tokenUser(token);
+	public void delete(long id, String username) {
+		User user = userRepository.findByUsername(username).orElseThrow(
+			() -> new NotFoundException(UserErrorCode.USER_NOT_FOUND)
+		);
 		if(user.getId() != id)
 			throw new MismatchException(UserErrorCode.USER_NOT_FOUND);
 		userRepository.deleteById(id);

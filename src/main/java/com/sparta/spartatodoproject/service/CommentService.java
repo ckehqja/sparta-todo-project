@@ -12,9 +12,11 @@ import com.sparta.spartatodoproject.exception.CommentErrorCode;
 import com.sparta.spartatodoproject.exception.MismatchException;
 import com.sparta.spartatodoproject.exception.NotFoundException;
 import com.sparta.spartatodoproject.exception.TodoErrorCode;
+import com.sparta.spartatodoproject.exception.UserErrorCode;
 import com.sparta.spartatodoproject.jwt.JwtService;
 import com.sparta.spartatodoproject.repository.CommentRepository;
 import com.sparta.spartatodoproject.repository.TodoRepository;
+import com.sparta.spartatodoproject.repository.UserRepository;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +24,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class CommentService {
+
 	private final CommentRepository commentRepository;
 	private final TodoRepository todoRepository;
-	private final JwtService jwtService;
-	public CommentResponseDto addComment(CommentRequestDto requestDto, String token) {
-		User user = jwtService.tokenUser(token);
+	private final UserRepository userRepository;
+
+	//댓글 저장
+	public CommentResponseDto addComment(CommentRequestDto requestDto, String username) {
+		User user = userRepository.findByUsername(username).orElseThrow(
+			() -> new NotFoundException(UserErrorCode.USER_NOT_FOUND));
 
 		Todo todo = todoRepository.findById(requestDto.getTodoId()).orElseThrow(
 			() -> new NotFoundException(TodoErrorCode.TODO_NOT_FOUND)
@@ -38,8 +44,10 @@ public class CommentService {
 
 	@Transactional
 	public CommentResponseDto updateComment(long id,
-		@Valid CommentRequestDto requestDto, String token) {
-		User user = jwtService.tokenUser(token);
+		@Valid CommentRequestDto requestDto, String username) {
+		User user = userRepository.findByUsername(username).orElseThrow(
+			() -> new NotFoundException(UserErrorCode.USER_NOT_FOUND)
+		);
 
 		Comment comment = commentRepository.findById(id).orElseThrow(
 			() -> new NotFoundException(CommentErrorCode.COMMENT_NOT_FOUND));
@@ -54,8 +62,9 @@ public class CommentService {
 		return new CommentResponseDto(comment);
 	}
 
-	public void deleteComment(long id, Long todoId, String token) {
-		User user = jwtService.tokenUser(token);
+	public void deleteComment(long id, Long todoId, String username) {
+		User user = userRepository.findByUsername(username).orElseThrow(
+			() -> new NotFoundException(UserErrorCode.USER_NOT_FOUND));
 
 		if (todoId == null)
 			throw new MismatchException(TodoErrorCode.ID_NOT_FOUND);
