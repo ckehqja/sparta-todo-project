@@ -27,7 +27,7 @@ public class LoggingAspect {
 
 	private final LoginHistoryRepository loginHistoryRepository;
 
-	// com.aop.controller 이하 패키지의 모든 클래스 이하 모든 메서드에 적용
+	// login 메서드에 적용
 	@Pointcut("execution(* com.sparta.spartatodoproject.service.UserService.login(..))")
 	private void cut() {
 	}

@@ -26,11 +26,11 @@ public class RefreshToken {
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@OneToOne
 	@JoinColumn(name = "users_id")
-	private User User;
+	private User user;
 
 	public RefreshToken(String refreshToken, User user) {
 		token = refreshToken;
-		User = user;
+		this.user = user;
 	}
 
 	public void updateToken(String refreshToken) {

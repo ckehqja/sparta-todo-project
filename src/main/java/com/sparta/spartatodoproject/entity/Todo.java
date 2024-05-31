@@ -47,10 +47,4 @@ public class Todo extends Timestamped {
 		this.title = requestDto.getTitle();
 		this.contents = requestDto.getContents();
 	}
-
-	public Todo(String title, String contents, User user) {
-		this.title = title;
-		this.contents = contents;
-		this.user = user;
-	}
 }

@@ -55,8 +55,7 @@ public class UserController {
 		@RequestBody LoginRequestDto requestDto) {
 		User user = userService.login(requestDto);
 		String accessToken = jwtUtil.createAccessToken(user.getUsername(), user.getRole());
-		// if(oldRefreshToken != null)
-		// 	jwtService.delete(oldRefreshToken);
+
 		String refreshToken = jwtUtil.createRefreshTaken();
 
 		log.info("access token: {}", accessToken);

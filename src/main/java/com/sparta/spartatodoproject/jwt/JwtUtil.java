@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import com.sparta.spartatodoproject.entity.User;
 import com.sparta.spartatodoproject.entity.UserRoleEnum;
-import com.sparta.spartatodoproject.exception.NotFoundException;
-import com.sparta.spartatodoproject.exception.UserErrorCode;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -117,8 +114,8 @@ public class JwtUtil {
 			return true;
 		} catch (SecurityException | MalformedJwtException | SignatureException e) {
 			log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
-		// } catch (ExpiredJwtException e) {
-		// 	log.error("Expired JWT token, 만료된 JWT token 입니다.");
+			// } catch (ExpiredJwtException e) {
+			// 	log.error("Expired JWT token, 만료된 JWT token 입니다.");
 		} catch (UnsupportedJwtException e) {
 			log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
 		} catch (IllegalArgumentException e) {
@@ -136,9 +133,8 @@ public class JwtUtil {
 	// HttpServletRequest : JWT 가져오기
 	public String getTokenFromRequest(String headerName, HttpServletRequest req) {
 
-		if (req.getHeader(headerName) != null) {
+		if (req.getHeader(headerName) != null)
 			return substringToken(req.getHeader(headerName));
-		}
 
 		return null;
 	}
@@ -150,6 +146,5 @@ public class JwtUtil {
 			return e.getClaims();
 		}
 	}
-
 
 }

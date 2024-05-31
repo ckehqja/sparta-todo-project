@@ -32,9 +32,6 @@ public class User extends Timestamped{
 	@Enumerated(EnumType.STRING)
 	private UserRoleEnum role;
 
-	// @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST)
-	// private List<User> users = new ArrayList<>();
-
 	public User(UserRequestDto requestDto, UserRoleEnum role, String password) {
 		this.nickname = requestDto.getNickname();
 		this.username = requestDto.getUsername();

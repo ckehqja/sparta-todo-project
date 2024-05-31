@@ -9,10 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,7 +20,6 @@ import com.sparta.spartatodoproject.dto.TodoAddRequestDto;
 import com.sparta.spartatodoproject.dto.TodoListResponseDto;
 import com.sparta.spartatodoproject.dto.TodoResponseDto;
 import com.sparta.spartatodoproject.jwt.JwtUtil;
-import com.sparta.spartatodoproject.service.StorageService;
 import com.sparta.spartatodoproject.service.TodoService;
 
 import io.swagger.v3.oas.annotations.Operation;

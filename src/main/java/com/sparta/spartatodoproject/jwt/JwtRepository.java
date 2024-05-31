@@ -9,5 +9,5 @@ import com.sparta.spartatodoproject.entity.User;
 
 public interface JwtRepository extends JpaRepository<RefreshToken, Long> {
 
-	Optional<RefreshToken> findByUserId(Long userId);
+	Optional<RefreshToken> findByUser(User user);
 }

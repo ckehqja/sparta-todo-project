@@ -2,7 +2,6 @@ package com.sparta.spartatodoproject.entity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

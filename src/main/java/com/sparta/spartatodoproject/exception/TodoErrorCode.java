@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum TodoErrorCode implements ErrorCode{
+public enum TodoErrorCode implements ErrorCode {
 
 	PW_MISMATCH(HttpStatus.BAD_REQUEST,
 		"비밀번호 불일치"),
